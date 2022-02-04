@@ -34,9 +34,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      - name: Build and push Centos7-Python3.8
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ferrosa/centos7-python3.8:latest      
+          tags: ferrosa/centos7-python3.8:latest 
+          file: centos7-python3.8/DockerFile     
 
