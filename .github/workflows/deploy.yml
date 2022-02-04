@@ -39,5 +39,5 @@ jobs:
         with:
           push: true
           tags: ferrosa/centos7-python3.8:latest 
-          file: centos7-python3.8/DockerFile     
+          file: centos7-python3.8/Dockerfile     
 
