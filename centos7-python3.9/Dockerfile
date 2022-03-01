@@ -1,4 +1,5 @@
-FROM centos:7
+# FROM centos:7
+FROM centos:7 AS base
 
 RUN yum -y update && \
     yum -y install wget gcc openssl-devel bzip2-devel libffi-devel zlib-devel make && \
@@ -8,6 +9,7 @@ RUN yum -y update && \
 ENV PYTHON_VERSION 3.9.10
 ENV GPG_KEY E3FF2839C048B25C084DEBE9B26995E310250568
 
+FROM base as compile
 # Download the code and compile
 RUN set -eux; \
     wget -O python.tgz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tgz" ;\
@@ -26,13 +28,12 @@ RUN set -eux; \
 		  --enable-optimizations \
 		  --enable-option-checking=fatal \
           ;\
-    make install ;\
-# enable GDB to load debugging data: https://github.com/docker-library/python/pull/701
-	bin="$(readlink -ve /usr/local/bin/python3)"; \
+    make altinstall
+FROM compile as install
+
+RUN set -eux; \
+	bin="$(readlink -ve /usr/local/bin/python3.9)"; \
 	dir="$(dirname "$bin")"; \
-	mkdir -p "/usr/share/gdb/auto-load/$dir"; \
-	cp -vL Tools/gdb/libpython.py "/usr/share/gdb/auto-load/$bin-gdb.py"; \
-	\
 	cd /; \
     ldconfig;\
     cd /; \
@@ -44,15 +45,13 @@ RUN set -eux; \
 			-o \( -type f -a -name 'wininst-*.exe' \) \
 		\) -exec rm -rf '{}' + \
 	; \
-    ln -svT /usr/local/bin/python3.8 /usr/local/bin/python3 ;\
-    ln -svT /usr/local/bin/idle3.8 /usr/local/bin/idle3 ;\
-    ln -svT /usr/local/bin/python3.8-config /usr/local/bin/python3-config ;\
-    ln -svT /usr/local/bin/pydoc3.8 /usr/local/bin/pydoc3 ;\
+    ln -svT /usr/local/bin/python3.9 /usr/local/bin/python3 ;\
+    ln -svT /usr/local/bin/idle3.9 /usr/local/bin/idle3 ;\
+    ln -svT /usr/local/bin/python3.9-config /usr/local/bin/python3-config ;\
+    ln -svT /usr/local/bin/pydoc3.9 /usr/local/bin/pydoc3 ;\
     python3 -m pip install -q pip --upgrade ;\
-    python3 --version
-
-
-RUN pip3 install -q pip --upgrade && \
+    python3 --version ;\
+    pip3 install -q pip --upgrade && \
     pip3 install -q wheel virtualenv && \
     pip3 cache purge && \
     pip3 --version
