@@ -1,4 +1,3 @@
-# FROM centos:7
 FROM centos:7 AS base
 
 RUN yum -y update && \
