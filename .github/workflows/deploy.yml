@@ -40,4 +40,10 @@ jobs:
           push: true
           tags: ferrosa/centos7-python3.8:latest 
           file: centos7-python3.8/Dockerfile     
+      - name: Build and push Centos7-Python3.9
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ferrosa/centos7-python3.9:latest 
+          file: centos7-python3.9/Dockerfile  
 
